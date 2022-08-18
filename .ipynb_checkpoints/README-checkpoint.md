@@ -3,5 +3,3 @@
 Luke, Tim, and Case Financial Enterprises
 
 The new standard in Finance.
-
-TLC LLC
