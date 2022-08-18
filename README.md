@@ -26,3 +26,7 @@ An application to input potential crypto/stock investments and see historical da
   - Runs analysis
   - Returns min/max monte carlo
   - Use PyScript to display visualizations
+  
+The new standard in Finance.
+
+TLC LLC
