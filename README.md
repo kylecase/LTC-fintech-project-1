@@ -2,7 +2,6 @@
 
 Luke, Tim, and Case Financial Enterprises
 
-
 ## The LTC Portfolio Optimizer
 Luke, Tim, and Case
 
