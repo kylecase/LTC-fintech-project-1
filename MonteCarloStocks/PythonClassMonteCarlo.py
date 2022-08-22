@@ -22,8 +22,8 @@ class Monte_Carlo:
         called from env file
     alpaca secret key : string 
         called from env file
-    stock_list : list
-        stock tickers inputted by user, up to and including three different stocks
+    stock_list : list of strings
+        stock tickers inputted by user
     trading_interval : string
         how long each interval is, defaulted to one day
     start_date : string
@@ -69,28 +69,8 @@ class Monte_Carlo:
         ).df
                  
         df_tickers = df_tickers.drop(['open', 'high', 'low', 'volume', 'trade_count', 'vwap'], axis =1)
-
-        if (len(self.stock_list) == 0):
-            print ('Please enter stock ticker(s)')
-        elif (len(self.stock_list) == 1):
-            one = self.stock_list[0],
-            df_tickers = pd.concat([one], axis =1, keys = [self.stock_list[0]])
-        elif (len(tickers) ==2):
-            one = self.stock_list[0]
-            one = df_tickers[df_tickers["symbol"]==one].drop("symbol", axis=1)
-            two = self.stock_list[1]
-            two = df_tickers[df_tickers["symbol"]==two].drop("symbol", axis=1)
-            df_tickers = pd.concat([one, two], axis =1, keys = [self.stock_list[0], self.stock_list[1]])
-        elif (len(tickers) ==3):
-            one = self.stock_list[0]
-            one = df_tickers[df_tickers["symbol"]==one].drop("symbol", axis=1)
-            two = self.stock_list[1]
-            two = df_tickers[df_tickers["symbol"]==two].drop("symbol", axis=1)
-            three = self.stock_list[2]
-            three =df_tickers[df_tickers["symbol"]==three].drop("symbol", axis=1)
-            df_tickers = pd.concat([one, two, three], axis =1, keys = [self.stock_list[0], self.stock_list[1], self.stock_list[2]])
-        elif (len(self.stock_list) > 3):
-              print('Overflow error, please select between one to three stock tickers.')
+        
+        df_tickers = pd.concat((df_tickers[df_tickers["symbol"]==i].drop("symbol",axis=1) for i in self.stock_list), axis=1, keys=self.stock_list)
         
                 
         self.df_tickers = df_tickers
