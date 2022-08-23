@@ -22,8 +22,6 @@ function App() {
   );
 
   const { items: covalentTokens } = data?.data?.data || {};
-  console.log(data);
-  console.log(covalentTokens);
 
   return (
     <div className="App">
