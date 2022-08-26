@@ -55,8 +55,6 @@ function App() {
 
   return (
     <div className="App">
-      {isLoading && <CircularProgress />}
-      {isError && <Alert severity="error">{error?.message}</Alert>}
       <header className="App-header">
         <Typography variant="h3">
           Welcome to the The LTC Portfolio Optimizer
@@ -70,6 +68,8 @@ function App() {
         >
           <Grid item xs={4}>
             <Grid container justifyContent="space-between">
+              {isLoading && <CircularProgress />}
+              {isError && <Alert severity="error">{error?.message}</Alert>}
               {covalentTokens?.length > 0 && (
                 <InvestmentSearchField
                   investmentOptions={normalizedInvestments}
@@ -107,6 +107,12 @@ function App() {
                   </Typography>
                 )}
               </Grid>
+              <input
+                style={{ visibility: "hidden" }}
+                id="portfolio-data"
+                className="py-input"
+                value={JSON.stringify(selectedInvestments)}
+              />
             </Grid>
           </Grid>
         </Grid>
