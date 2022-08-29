@@ -3,6 +3,7 @@ from js import XMLHttpRequest
 import pandas as pd
 from MCForecastTools import MCSimulation
 import matplotlib
+import numpy as np
 
 
 def ltc_run(*ags):
@@ -17,6 +18,7 @@ def ltc_run(*ags):
     line_plot_dict = {}
     simulated_returns_data_dict = {}
 
+    # fetch data
     req = XMLHttpRequest.new()
     req.open("GET", "/api/alpaca/tokens", False)
     req.send(None)
@@ -44,12 +46,10 @@ def ltc_run(*ags):
     coin_table_df['total_volume_24h_quote'] = coin_table_df['total_volume_24h_quote'].astype(
         float)
 
-    # Created list of tickers to us as options that can be searched to build custom portfolio
-    ticker_symbol_list = coin_table_df['contract_ticker_symbol'].tolist()
-
-    # Created dictionary with ticker name: contract name to have if needed
-    ticker_name_dict = dict(
-        zip(coin_table_df.contract_ticker_symbol, coin_table_df.contract_name))
+    # Reindexing by top traded coins to drop the less popular coins
+    coin_table_df = coin_table_df.sort_values(
+        'swap_count_24h', ascending=False)
+    coin_table_df = coin_table_df.reset_index(drop=True)
 
     # Created a dictionary with ticker: contact address to use in the price history API pull
     ticker_contract_dict = dict(
@@ -61,9 +61,6 @@ def ltc_run(*ags):
     # Check len of ticker list to use to set the count variable
     len_ticker_list = len(ticker_list)
     count = len_ticker_list - 1
-
-    # Created a list of weights that pairs with tickers in ticker_list
-    weight_list = list(portfolio_imput.values())
 
     # Created a dict that refrences the master ticker_contract_dict to pull only our portfolio ticker contract addresses
     portfolio_contact_dict = {
@@ -80,7 +77,6 @@ def ltc_run(*ags):
         nextReq.open("GET", f"/api/alpaca/historical/{contract_id}", False)
         nextReq.send(None)
         response_coin_price = json.loads(nextReq.response)
-        print(response_coin_price)
 
         # Create a temporary dataframe to store the returned price data
         coin_price_table = response_coin_price['data'][0]['prices']
@@ -118,11 +114,9 @@ def ltc_run(*ags):
     no_history_string = ' '
     no_history_string = no_history_string.join(no_history)
     no_history_string = no_history_string.replace(' ', ', ')
+
     print(
         f'Unfortunatly we were unable to pull history for the following tickers: {no_history_string}. Your portfolio optimizer will continue with the following tickers: {found_history_string}.')
-
-    portfolio_weight_dict = {
-        your_key: portfolio_imput[your_key] for your_key in found_history}
 
     imput_df = pd.DataFrame.from_dict(
         portfolio_imput, orient='index', dtype=float, columns=['weights'])
@@ -133,13 +127,9 @@ def ltc_run(*ags):
     new_weights = list(imput_df.new_weight_pct)
 
     x = 0
-
     while x < len(df_dict):
         df_dict[str(found_history[x])].columns = pd.MultiIndex.from_product(
             [df_dict[str(found_history[x])].columns, ['close']])
-        #df_dict[str(found_history[x])].rename(columns={str(found_history[x]):'close'}, inplace=True, level=0)
-        #df_dict[str(found_history[x])]['symbol'] = str(found_history[x])
-        #df_dict[str(found_history[x])] = df_dict[str(found_history[x])][df_dict[str(found_history[x])]['symbol']==str(found_history[x])].drop('symbol', axis=1)
         x += 1
 
     num_sims = 500
@@ -152,10 +142,12 @@ def ltc_run(*ags):
             num_simulation=num_sims,
             num_trading_days=365
         )
-        #mc_dict[str(found_history[x])] = mc_dict[str(found_history[x])].calc_cumulative_return()
         x += 1
 
+    simulated_returns_data_dict_nums = {}
+
     x = 0
+    mc_dict[str(found_history[x])]
     while x < len(df_dict):
         line_plot_dict[str(found_history[x])] = mc_dict[str(
             found_history[x])].plot_simulation()
@@ -164,7 +156,6 @@ def ltc_run(*ags):
         x += 1
 
     simulated_returns_data_dict_nums = {}
-
     x = 0
     while x < len(mc_dict):
         # Compute summary statistics from the simulated daily returns
@@ -182,13 +173,38 @@ def ltc_run(*ags):
         simulated_returns_data_dict[str(
             found_history[x])] = simulated_returns_data_dict[str(found_history[x])].plot()
         #simulated_returns_data_dict[str(found_history[x])] = simulated_returns_data_dict[str(found_history[x])]
-        simulated_returns_data_dict[str(found_history[x])].figure.savefig(
-            f'{str(found_history[x])}_simulated_returns')
+        # simulated_returns_data_dict[str(found_history[x])].figure.savefig(
+        #     f'{str(found_history[x])}_simulated_returns')
 
         #testdf = pd.concat([testdf,  pd.DataFrame(simulated_returns_data_dict[str(found_history[x])])], axis=1)
 
         x += 1
 
     daily_returns = portfolio_df.pct_change()
+    volatility = daily_returns.std() * np.sqrt(365)
+    pyscript.write('volatility', volatility)
 
-    pyscript.write('output', daily_returns)
+    volatility.sort_values(inplace=True)
+
+    portfolio_returns = daily_returns.dot(new_weights)
+    pyscript.write('portfolio-returns', portfolio_returns)
+
+    cumulative_returns = (1 + portfolio_returns).cumprod()
+    pyscript.write('cumulative-returns', cumulative_returns)
+
+    initial_investment_portfolio = 10000
+    cumulative_profit = initial_investment_portfolio * cumulative_returns
+    cumulative_profit.plot().figure.savefig('total_return_history')
+
+    correlation = daily_returns.corr()
+
+    correlation.sum(axis=0).sort_values()
+
+    # Used the mean and std functions to calculate the annualized sharpe ratio, higher = better
+    sharpe_ratios = (daily_returns.mean() * 365) / \
+        (daily_returns.std() * np.sqrt(365))
+
+    pyscript.write('sharpe-ratio', sharpe_ratios)
+
+    # pyscript.write(
+    #     'output', [volatility, portfolio_returns, cumulative_returns])

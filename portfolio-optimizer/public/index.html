@@ -39,10 +39,27 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <div class="py-container">
-      <div id="output"></div>
-       <button id="py-initiator" class="run-analysis" pys-onClick="ltc_run">
+      <button id="py-initiator" class="run-analysis" pys-onClick="ltc_run">
               Run Analysis
         </button>
+      <div id="output"></div>
+      
+      <h4>Volatility: </h4>
+      <div id="volatility">
+      </div>
+            <h4>Portfolio returns: </h4>
+
+      <div id="portfolio-returns">
+      </div>
+                  <h4>Cumulative returns: </h4>
+
+      <div id="cumulative-returns">
+      </div>
+                  <h4>Sharpe Ratios: </h4>
+
+      <div id="sharpe-ratio">
+      </div>
+       
     </div>
    
     <!--
@@ -55,7 +72,16 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      const btn = document.getElementById('py-initiator');
+
+      btn.addEventListener('click', () => {
+        // 👇️ hide button
+        btn.style.display = 'none';
+      });
+    </script>
     <py-script src="./run_analysis.py"></py-script>
+    
 
   </body>
  
