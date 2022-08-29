@@ -25,7 +25,9 @@ An application to input potential crypto/stock investments and see historical da
   - Runs analysis
   - Returns min/max monte carlo
   - Use PyScript to display visualizations
-  
-The new standard in Finance.
 
-TLC LLC
+
+### Installation and use
+To run the python algorithms directly you can use the `CovalentapiV2.ipynb` file for Crypto, and `MonteCarloStocks/PythonClassMonteCarlo.ipynb` file for Stocks
+
+For running the web-based interface, you must navigate to `/portfolio-optimizer` and follow the README at that directory.

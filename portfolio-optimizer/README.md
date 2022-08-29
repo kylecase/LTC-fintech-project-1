@@ -14,6 +14,16 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
+For the API requests to run properly, you must also start the proxy server with the following command:
+
+### `yarn start:server`
+Starts a proxy server for navigating endpoints that require API keys. You should have the react development server running and this proxy server simultaneously (You may need to run muliple terminal windows)
+
+Make sure you have a `.env` file at the root of your directory with the following values:
+REACT_APP_COVALENT_API_KEY=your_key_here
+REACT_APP_ALPACA_API_KEY=your_key_here
+REACT_APP_ALPACA_SECRET_KEY=your_secret_here
+
 ### `yarn test`
 
 Launches the test runner in the interactive watch mode.\
