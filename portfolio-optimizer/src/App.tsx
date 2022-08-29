@@ -63,12 +63,16 @@ function App() {
         <Grid
           container
           justifyContent="center"
-          spacing={12}
+          spacing={3}
           alignItems="flex-start"
         >
           <Grid item xs={4}>
             <Grid container justifyContent="space-between">
-              {isLoading && <CircularProgress />}
+              {isLoading && (
+                <Grid container justifyContent="center">
+                  <CircularProgress />
+                </Grid>
+              )}
               {isError && <Alert severity="error">{error?.message}</Alert>}
               {covalentTokens?.length > 0 && (
                 <InvestmentSearchField
@@ -78,7 +82,7 @@ function App() {
               )}
             </Grid>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={3}>
             <Grid
               container
               justifyContent="flex-start"
